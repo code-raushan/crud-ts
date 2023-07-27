@@ -5,6 +5,10 @@ import { isAuthenticated } from '../middleware/isAuthenticated';
 import { isAdmin } from '../middleware/isAdmin';
 const router = express.Router();
 
+/*
+Protected Routes: Role Based Authorisation
+*/
+
 // Auth Routes
 router.post('/signup', signup);
 router.post('/login', login);

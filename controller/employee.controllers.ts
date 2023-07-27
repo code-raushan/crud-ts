@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import { Employee } from "../model/employee.model";
 import { EmployeeType } from "../types/Employee";
-import { MongooseError } from "mongoose";
-
+import { Mongoose, MongooseError } from "mongoose";
+import { CustomError } from "../utils/CustomError";
 
 interface CreateEmployeeBody {
     firstName: string;
@@ -20,7 +20,6 @@ export const createEmployee = async (req: Request, res: Response) => {
                 message: 'All fields are required'
             })
         }
-
         const empAlreadyExist = (await Employee.findOne({ email })) as EmployeeType | null;
         if (empAlreadyExist) {
             return res.status(400).json({
@@ -41,20 +40,7 @@ export const createEmployee = async (req: Request, res: Response) => {
             data: emp,
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Employee creation failed',
-                err: error.message
-            });
-        };
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 401, 'Employee creation failed', error as MongooseError|Error)
     };
 
 };
@@ -68,20 +54,8 @@ export const getEmployees = async (req: Request, res: Response) => {
             data: allEmployees
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Retrieval failed',
-                err: error.message
-            });
-        }
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 401, 'Failed to retrieve the users', error as MongooseError|Error)
+
     };
 };
 
@@ -101,20 +75,8 @@ export const getEmployeeById = async (req: Request, res: Response) => {
             data: emp
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Retrieval failed',
-                err: error.message
-            });
-        }
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 401, 'Failed to retrieve the employee by id', error as MongooseError|Error)
+
     };
 };
 
@@ -134,20 +96,8 @@ export const deleteEmployee = async (req: Request, res: Response) => {
             data: deletedEmp
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Deletion failed',
-                err: error.message
-            });
-        }
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 401, 'Failed to delete the employee', error as MongooseError|Error)
+
     }
 }
 
@@ -168,20 +118,6 @@ export const updateEmployee = async (req: Request, res: Response) => {
             data: updatedEmployee
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Updation failed',
-                err: error.message
-            });
-        }
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 401, 'Failed to update the employee', error as MongooseError|Error)
     }
-
 }

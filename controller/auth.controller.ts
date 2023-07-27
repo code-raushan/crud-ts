@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { User } from "../model/auth.model"
 import { MongooseError } from "mongoose";
+import { CustomError } from "../utils/CustomError";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 interface SignUpBody{
     fullName: string;
@@ -57,20 +59,7 @@ export const signup = async (req:Request, res:Response)=>{
             data: user,
         });
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Employee creation failed',
-                err: error.message
-            });
-        };
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 400, 'Something went wrong', error as Error|JsonWebTokenError)
     };
 };
 /******************************************************
@@ -113,20 +102,7 @@ export const login = async(req:Request, res:Response)=>{
             })
         }
     } catch (error) {
-        if (error instanceof MongooseError) {
-            res.status(401).json({
-                success: false,
-                message: 'Login failed',
-                err: error.message
-            });
-        };
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Failed',
-                err: error.message
-            });
-        };
+        CustomError(res, 400, 'Something went wrong', error as Error|JsonWebTokenError)
     };
 };
 /******************************************************
