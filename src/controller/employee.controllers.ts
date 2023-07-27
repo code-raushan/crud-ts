@@ -10,13 +10,11 @@ interface CreateEmployeeBody {
     department: string;
 }
 
-
-
 export const create = async (req: Request, res: Response) => {
     const { firstName, lastName, email, department }: CreateEmployeeBody = req.body;
 
     try {
-        const empAlreadyExist = await Employee.findOne({ email });
+        const empAlreadyExist = (await Employee.findOne({ email })) as EmployeeType | null;
         if (empAlreadyExist) {
             return res.status(400).json({
                 message: 'Employee Already Exist'
@@ -32,10 +30,10 @@ export const create = async (req: Request, res: Response) => {
         await emp.save();
         res.json({
             success: true,
-            emp,
+            message: 'Employee created successfully',
+            data: emp,
         });
     } catch (error) {
-
         if(error instanceof MongooseError){
             res.status(401).json({
                 success: false,
@@ -53,13 +51,14 @@ export const create = async (req: Request, res: Response) => {
     };
 
 };
+
 export const getEmployees = async (req:Request, res:Response)=>{
     try {
-        const allEmployees = (await Employee.find({})) as EmployeeType[];
+        const allEmployees = (await Employee.find({})) as EmployeeType[] | null;
         res.status(200).json({
             success: true,
             message: 'Fetched all employees',
-            allEmployees
+            data: allEmployees
         });
     } catch (error) {
         if(error instanceof MongooseError){
@@ -81,18 +80,18 @@ export const getEmployees = async (req:Request, res:Response)=>{
 
 export const getEmployeeById = async (req:Request, res:Response) => {
     const {id} = req.params;
-    if(!id){
-        return res.status(401).json({
-            success: false,
-            message: 'Employee does not exist'
-        })
-    }
     try {
-        const emp = (await Employee.findById(id)) as EmployeeType;
+        if(!id){
+            return res.status(401).json({
+                success: false,
+                message: 'Employee does not exist'
+            })
+        }
+        const emp = (await Employee.findById(id)) as EmployeeType | null;
         res.status(200).json({
             success: true,
             message: 'Retrieved the employee',
-            emp
+            data: emp
         });
     } catch (error) {
         if(error instanceof MongooseError){
@@ -109,5 +108,73 @@ export const getEmployeeById = async (req:Request, res:Response) => {
                 err: error.message
             });
         };
+    };
+};
+
+export const deleteEmployee = async(req:Request, res:Response)=>{
+    const {id}=req.params;
+    try {
+        if(!id){
+            return res.status(401).json({
+                success: false,
+                message: 'Employee does not exist'
+            });
+        };
+        const deletedEmp = (await Employee.findByIdAndDelete(id)) as EmployeeType | null;
+        res.status(200).json({
+            success: true,
+            message: 'Deleted the employee',
+            data: deletedEmp
+        });
+    } catch (error) {
+        if(error instanceof MongooseError){
+            res.status(401).json({
+                success: false,
+                message: 'Deletion failed',
+                err: error.message
+            });
+        }
+        if(error instanceof Error){
+            res.status(500).json({
+                success: false,
+                message: 'Failed',
+                err: error.message
+            });
+        };
     }
+}
+
+export const updateEmployee = async(req:Request, res:Response)=>{
+    const data = req.body;
+    const {id}=req.params;
+    try {
+        if(!id){
+            return res.status(401).json({
+                success: false,
+                message: 'Employee does not exist'
+            });
+        };
+        const updatedEmployee = (await Employee.findByIdAndUpdate(id, {...data}, {new: true})) as EmployeeType | null;
+        res.status(200).json({
+            success: true,
+            message: 'Updated the employee',
+            data: updatedEmployee
+        });
+    } catch (error) {
+        if(error instanceof MongooseError){
+            res.status(401).json({
+                success: false,
+                message: 'Updation failed',
+                err: error.message
+            });
+        }
+        if(error instanceof Error){
+            res.status(500).json({
+                success: false,
+                message: 'Failed',
+                err: error.message
+            });
+        };
+    }
+
 }
