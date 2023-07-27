@@ -7,8 +7,10 @@ import routes from './router/routes';
 import morgan from "morgan";
 import cookieParser from 'cookie-parser';
 
-const app = express();
+const app:Express = express();
+
 connectToDb();
+
 app.use(cookieParser())
 app.use(express.json());
 app.use(morgan('tiny'));
@@ -18,22 +20,9 @@ app.get('/', (req:Request, res:Response)=>{
     res.send('Welcome to the Server');
 });
 app.use('/api', routes )
+//protected routes
 app.use('/api/auth', protectedRoutes);
 
-// app.post('/post', async(req:Request,res:Response)=>{
-//     const emp1 = await new Employee({
-//         firstName: 'Raushan',
-//         lastName: 'Kumar',
-//         email: 'raushan@gmail.com',
-//         department: 'Tech'
-//     });
-//     await emp1.save();
-//     res.status(200).json({
-//         success: true,
-//         message: "Employee created",
-//         emp1
-//     })
-// })
 
 export default app;
 

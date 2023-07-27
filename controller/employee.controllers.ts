@@ -16,13 +16,13 @@ export const createEmployee = async (req: Request, res: Response) => {
 
     try {
         if(!firstName || !lastName || !email || !department){
-            return res.status(401).json({
+            return res.status(406).json({
                 message: 'All fields are required'
             })
         }
         const empAlreadyExist = (await Employee.findOne({ email })) as EmployeeType | null;
         if (empAlreadyExist) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: 'Employee already exists'
             });
         };
@@ -34,13 +34,13 @@ export const createEmployee = async (req: Request, res: Response) => {
         })) as EmployeeType;
 
         await emp.save();
-        res.json({
+        res.status(201).json({
             success: true,
             message: 'Employee created successfully',
             data: emp,
         });
     } catch (error) {
-        CustomError(res, 401, 'Employee creation failed', error as MongooseError|Error)
+        CustomError(res, 400, 'Employee creation failed', error as MongooseError|Error)
     };
 
 };
@@ -75,7 +75,7 @@ export const getEmployeeById = async (req: Request, res: Response) => {
             data: emp
         });
     } catch (error) {
-        CustomError(res, 401, 'Failed to retrieve the employee by id', error as MongooseError|Error)
+        CustomError(res, 404, 'Not Found', error as MongooseError|Error)
 
     };
 };
@@ -84,7 +84,7 @@ export const deleteEmployee = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         if (!id) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
                 message: 'Employee does not exist'
             });
@@ -92,11 +92,11 @@ export const deleteEmployee = async (req: Request, res: Response) => {
         const deletedEmp = (await Employee.findByIdAndDelete(id)) as EmployeeType | null;
         res.status(200).json({
             success: true,
-            message: 'Deleted the employee',
+            message: 'Employee deleted',
             data: deletedEmp
         });
     } catch (error) {
-        CustomError(res, 401, 'Failed to delete the employee', error as MongooseError|Error)
+        CustomError(res, 403, 'Failed to delete the employee', error as MongooseError|Error)
 
     }
 }
@@ -106,9 +106,9 @@ export const updateEmployee = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         if (!id) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
-                message: 'Employee does not exist'
+                message: 'Employee not found'
             });
         };
         const updatedEmployee = (await Employee.findByIdAndUpdate(id, { ...data }, { new: true })) as EmployeeType | null;
@@ -118,6 +118,6 @@ export const updateEmployee = async (req: Request, res: Response) => {
             data: updatedEmployee
         });
     } catch (error) {
-        CustomError(res, 401, 'Failed to update the employee', error as MongooseError|Error)
+        CustomError(res, 403, 'Failed to update the employee', error as MongooseError|Error)
     }
 }
