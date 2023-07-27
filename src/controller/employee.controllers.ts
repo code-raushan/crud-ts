@@ -78,6 +78,7 @@ export const getEmployees = async (req:Request, res:Response)=>{
         };
     };
 };
+
 export const getEmployeeById = async (req:Request, res:Response) => {
     const {id} = req.params;
     if(!id){
