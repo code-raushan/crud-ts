@@ -1,7 +1,8 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { Employee } from "../model/employee.model";
 import { EmployeeType } from "../types/Employee";
 import { MongooseError } from "mongoose";
+
 
 interface CreateEmployeeBody {
     firstName: string;
@@ -10,14 +11,20 @@ interface CreateEmployeeBody {
     department: string;
 }
 
-export const create = async (req: Request, res: Response) => {
+export const createEmployee = async (req: Request, res: Response) => {
     const { firstName, lastName, email, department }: CreateEmployeeBody = req.body;
 
     try {
+        if(!firstName || !lastName || !email || !department){
+            return res.status(401).json({
+                message: 'All fields are required'
+            })
+        }
+
         const empAlreadyExist = (await Employee.findOne({ email })) as EmployeeType | null;
         if (empAlreadyExist) {
             return res.status(400).json({
-                message: 'Employee Already Exist'
+                message: 'Employee already exists'
             });
         };
         const emp = (new Employee({
@@ -34,14 +41,14 @@ export const create = async (req: Request, res: Response) => {
             data: emp,
         });
     } catch (error) {
-        if(error instanceof MongooseError){
+        if (error instanceof MongooseError) {
             res.status(401).json({
                 success: false,
                 message: 'Employee creation failed',
                 err: error.message
             });
         };
-        if(error instanceof Error){
+        if (error instanceof Error) {
             res.status(500).json({
                 success: false,
                 message: 'Failed',
@@ -52,7 +59,7 @@ export const create = async (req: Request, res: Response) => {
 
 };
 
-export const getEmployees = async (req:Request, res:Response)=>{
+export const getEmployees = async (req: Request, res: Response) => {
     try {
         const allEmployees = (await Employee.find({})) as EmployeeType[] | null;
         res.status(200).json({
@@ -61,14 +68,14 @@ export const getEmployees = async (req:Request, res:Response)=>{
             data: allEmployees
         });
     } catch (error) {
-        if(error instanceof MongooseError){
+        if (error instanceof MongooseError) {
             res.status(401).json({
                 success: false,
                 message: 'Retrieval failed',
                 err: error.message
             });
         }
-        if(error instanceof Error){
+        if (error instanceof Error) {
             res.status(500).json({
                 success: false,
                 message: 'Failed',
@@ -78,10 +85,10 @@ export const getEmployees = async (req:Request, res:Response)=>{
     };
 };
 
-export const getEmployeeById = async (req:Request, res:Response) => {
-    const {id} = req.params;
+export const getEmployeeById = async (req: Request, res: Response) => {
+    const { id } = req.params;
     try {
-        if(!id){
+        if (!id) {
             return res.status(401).json({
                 success: false,
                 message: 'Employee does not exist'
@@ -94,14 +101,14 @@ export const getEmployeeById = async (req:Request, res:Response) => {
             data: emp
         });
     } catch (error) {
-        if(error instanceof MongooseError){
+        if (error instanceof MongooseError) {
             res.status(401).json({
                 success: false,
                 message: 'Retrieval failed',
                 err: error.message
             });
         }
-        if(error instanceof Error){
+        if (error instanceof Error) {
             res.status(500).json({
                 success: false,
                 message: 'Failed',
@@ -111,10 +118,10 @@ export const getEmployeeById = async (req:Request, res:Response) => {
     };
 };
 
-export const deleteEmployee = async(req:Request, res:Response)=>{
-    const {id}=req.params;
+export const deleteEmployee = async (req: Request, res: Response) => {
+    const { id } = req.params;
     try {
-        if(!id){
+        if (!id) {
             return res.status(401).json({
                 success: false,
                 message: 'Employee does not exist'
@@ -127,14 +134,14 @@ export const deleteEmployee = async(req:Request, res:Response)=>{
             data: deletedEmp
         });
     } catch (error) {
-        if(error instanceof MongooseError){
+        if (error instanceof MongooseError) {
             res.status(401).json({
                 success: false,
                 message: 'Deletion failed',
                 err: error.message
             });
         }
-        if(error instanceof Error){
+        if (error instanceof Error) {
             res.status(500).json({
                 success: false,
                 message: 'Failed',
@@ -144,31 +151,31 @@ export const deleteEmployee = async(req:Request, res:Response)=>{
     }
 }
 
-export const updateEmployee = async(req:Request, res:Response)=>{
+export const updateEmployee = async (req: Request, res: Response) => {
     const data = req.body;
-    const {id}=req.params;
+    const { id } = req.params;
     try {
-        if(!id){
+        if (!id) {
             return res.status(401).json({
                 success: false,
                 message: 'Employee does not exist'
             });
         };
-        const updatedEmployee = (await Employee.findByIdAndUpdate(id, {...data}, {new: true})) as EmployeeType | null;
+        const updatedEmployee = (await Employee.findByIdAndUpdate(id, { ...data }, { new: true })) as EmployeeType | null;
         res.status(200).json({
             success: true,
             message: 'Updated the employee',
             data: updatedEmployee
         });
     } catch (error) {
-        if(error instanceof MongooseError){
+        if (error instanceof MongooseError) {
             res.status(401).json({
                 success: false,
                 message: 'Updation failed',
                 err: error.message
             });
         }
-        if(error instanceof Error){
+        if (error instanceof Error) {
             res.status(500).json({
                 success: false,
                 message: 'Failed',

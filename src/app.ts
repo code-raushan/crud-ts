@@ -2,12 +2,13 @@ import dotenv from 'dotenv'
 dotenv.config();
 import express, { Express, Request, Response } from "express";
 import connectToDb from "./config/db";
-import router from './router/employee.router';
+import router from './router/routes';
 import morgan from "morgan";
+import cookieParser from 'cookie-parser';
 
 const app = express();
 connectToDb();
-
+app.use(cookieParser())
 app.use(express.json());
 app.use(morgan('tiny'));
 
