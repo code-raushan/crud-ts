@@ -47,9 +47,9 @@ router.get('/employees', getEmployees);
    *               department: 
    *                type: string
    *           example:
-   *               firstName: John Doe
-   *               lastName: Doe
-   *               email: john@example.com
+   *               firstName: Raushan
+   *               lastName: Kumar
+   *               email: raushan@email.com
    *               department: IT
    *     responses:
    *      201:
