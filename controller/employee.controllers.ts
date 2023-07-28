@@ -34,7 +34,7 @@ export const createEmployee = async (req: Request, res: Response) => {
         })) as EmployeeType;
 
         await emp.save();
-        res.status(201).json({
+        res.status(200).json({
             success: true,
             message: 'Employee created successfully',
             data: emp,
