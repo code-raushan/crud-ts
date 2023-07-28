@@ -4,7 +4,7 @@
 
 Tests:
 * npm run test-getEmployee : Test for getting all items
-* test-getEmployeeById: Test for getting the item by its id
-* test-createEmployee: Test for creating an item
-* test-deleteEmployee: Test for deleting the item by id
-* test-updateEmployee": Test for updating the item
+* npm run test-getEmployeeById: Test for getting the item by its id
+* npm run test-createEmployee: Test for creating an item
+* npm run test-deleteEmployee: Test for deleting the item by id
+* npm run test-updateEmployee": Test for updating the item
